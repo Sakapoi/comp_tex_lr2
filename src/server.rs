@@ -1,13 +1,27 @@
+use core::slice::SlicePattern;
 use std::thread;
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::{Read, Write};
+
+
+
 
 fn handle_client(mut stream: TcpStream) {
     let mut data = [0 as u8; 50]; // using 50 byte buffer
     while match stream.read(&mut data) {
         Ok(size) => {
             // echo everything!
-            stream.write(&data[0..size]).unwrap();
+            if String::from_utf8(data.to_vec()).unwrap()=="шо там?".to_owned()
+            {
+                let spisok_failov = std::fs::read_dir(".").unwrap()
+                .map(|res| res.map(|e| e.path()))
+                .collect::<Result<Vec<_>, std::io::Error>>().unwrap();
+
+                let x = spisok_failov.iter().flat_map( |x|x.to_str().unwrap().as_bytes().to_owned()).collect::<Vec<_>>();
+
+                stream.write( x.as_slice());
+            }
+
             true
         },
         Err(_) => {

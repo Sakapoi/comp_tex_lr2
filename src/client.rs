@@ -7,7 +7,7 @@ fn main() {
         Ok(mut stream) => {
             println!("Successfully connected to server in port 3333");
 
-            let msg = b"Hello!";
+            let msg = b"шо там?";
 
             stream.write(msg).unwrap();
             println!("Sent Hello, awaiting reply...");
