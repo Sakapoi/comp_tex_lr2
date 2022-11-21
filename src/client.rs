@@ -1,5 +1,5 @@
-use std::net::{TcpStream};
 use std::io::{Read, Write};
+use std::net::TcpStream;
 use std::str::from_utf8;
 
 fn main() {
@@ -7,26 +7,37 @@ fn main() {
         Ok(mut stream) => {
             println!("Successfully connected to server in port 3333");
 
-            let msg = b"шо там?";
+            let msg = "qqw";
 
-            stream.write(msg).unwrap();
+            stream.write(msg.as_bytes()).unwrap();
             println!("Sent Hello, awaiting reply...");
 
-            let mut data = [0 as u8; 6]; // using 6 byte buffer
-            match stream.read_exact(&mut data) {
+            let mut data = [0 as u8; 2048]; // using 6 byte buffer
+                                            //let mut data = vec![];
+
+            match stream.read(&mut data) {
                 Ok(_) => {
-                    if &data == msg {
-                        println!("Reply is ok!");
-                    } else {
-                        let text = from_utf8(&data).unwrap();
-                        println!("Unexpected reply: {}", text);
-                    }
-                },
+                    //let text = from_utf8(&data).unwrap();
+                    let data = data
+                        .to_vec()
+                        .iter()
+                        .filter(|&&cheto| cheto != 0)
+                        .map(|cheto| cheto.to_owned())
+                        .collect();
+                    let x = String::from_utf8(data).unwrap();
+                    dbg!(&x);
+                    let text: Vec<String> = serde_json::from_str(&x.trim()).unwrap();
+                    let mut file = std::fs::File::create("./result.txt").unwrap();
+                    text.iter().for_each(|chenibyd|{
+                        file.write_fmt(format_args!("{chenibyd}\n")).unwrap();
+                    });
+                    println!("Unexpected reply: {:?}", text);
+                }
                 Err(e) => {
                     println!("Failed to receive data: {}", e);
                 }
             }
-        },
+        }
         Err(e) => {
             println!("Failed to connect: {}", e);
         }

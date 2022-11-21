@@ -1,31 +1,44 @@
-use core::slice::SlicePattern;
-use std::thread;
-use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::{Read, Write};
-
-
-
+use std::net::{Shutdown, TcpListener, TcpStream};
+use std::thread;
 
 fn handle_client(mut stream: TcpStream) {
-    let mut data = [0 as u8; 50]; // using 50 byte buffer
+    let mut data = [0 as u8; 3]; // using 50 byte buffer
     while match stream.read(&mut data) {
-        Ok(size) => {
+        Ok(_) => {
             // echo everything!
-            if String::from_utf8(data.to_vec()).unwrap()=="шо там?".to_owned()
-            {
-                let spisok_failov = std::fs::read_dir(".").unwrap()
-                .map(|res| res.map(|e| e.path()))
-                .collect::<Result<Vec<_>, std::io::Error>>().unwrap();
+            let me_die = String::from_utf8(data.to_vec()).unwrap();
+            println!(
+                "Я Пидорас, {} {}\n{me_die}/qqw",
+                String::from_utf8(data.to_vec()).unwrap(),
+                format!("{me_die}") == format!("{me_die}")
+            );
+            println!("cyka, pochemy ne rabotaet nixyя");
+            me_die.chars().for_each(|igor| println!("{igor}"));
+            match me_die.trim_end() {
+                "шо с ебалом?" => println!("NE xyeta"),
+                oleg => println!("XYETA, {oleg}"),
+            };
+            if me_die.to_lowercase() == "qqw".to_string().to_lowercase() {
+                println!("Люблю сосать");
+                let spisok_failov = std::fs::read_dir(".")
+                    .unwrap()
+                    .map(|res| res.map(|e| e.path()))
+                    .collect::<Result<Vec<_>, std::io::Error>>()
+                    .unwrap();
 
-                let x = spisok_failov.iter().flat_map( |x|x.to_str().unwrap().as_bytes().to_owned()).collect::<Vec<_>>();
+                let x = serde_json::to_string(&spisok_failov).unwrap();
 
-                stream.write( x.as_slice());
+                stream.write(x.as_bytes()).unwrap();
             }
-
+            //println!("ok");
             true
-        },
+        }
         Err(_) => {
-            println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
+            println!(
+                "An error occurred, terminating connection with {}",
+                stream.peer_addr().unwrap()
+            );
             stream.shutdown(Shutdown::Both).unwrap();
             false
         }
@@ -40,7 +53,7 @@ fn main() {
         match stream {
             Ok(stream) => {
                 println!("New connection: {}", stream.peer_addr().unwrap());
-                thread::spawn(move|| {
+                thread::spawn(move || {
                     // connection succeeded
                     handle_client(stream)
                 });

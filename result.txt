@@ -1,0 +1,6 @@
+./.git
+./.gitignore
+./Cargo.lock
+./Cargo.toml
+./src
+./target
