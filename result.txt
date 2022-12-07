@@ -1,6 +1,2 @@
-./.git
-./.gitignore
-./Cargo.lock
-./Cargo.toml
-./src
-./target
+./src/client.rs
+./src/server.rs

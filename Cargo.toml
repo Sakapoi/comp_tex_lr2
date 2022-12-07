@@ -1,5 +1,5 @@
 [package]
-name = "ivchenko_pidor"
+name = "lr2"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,11 +7,13 @@ edition = "2021"
 
 [dependencies]
 serde_json = "*"
+log = "0.4"
+pretty_env_logger = "0.4.0"
 
 [[bin]]
-name = "Sanya"
+name = "sanya"
 path = "src/client.rs"
 
 [[bin]]
-name = "Peter"
+name = "peter"
 path = "src/server.rs"

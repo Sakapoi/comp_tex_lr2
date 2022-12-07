@@ -3,36 +3,37 @@ use std::net::{Shutdown, TcpListener, TcpStream};
 use std::thread;
 
 fn handle_client(mut stream: TcpStream) {
-    let mut data = [0 as u8; 3]; // using 50 byte buffer
+    let mut data = [0 as u8; 2048]; // using 50 byte buffer
     while match stream.read(&mut data) {
         Ok(_) => {
             // echo everything!
-            let me_die = String::from_utf8(data.to_vec()).unwrap();
-            println!(
-                "Я Пидорас, {} {}\n{me_die}/qqw",
-                String::from_utf8(data.to_vec()).unwrap(),
-                format!("{me_die}") == format!("{me_die}")
-            );
-            println!("cyka, pochemy ne rabotaet nixyя");
-            me_die.chars().for_each(|igor| println!("{igor}"));
-            match me_die.trim_end() {
-                "шо с ебалом?" => println!("NE xyeta"),
-                oleg => println!("XYETA, {oleg}"),
-            };
-            if me_die.to_lowercase() == "qqw".to_string().to_lowercase() {
-                println!("Люблю сосать");
-                let spisok_failov = std::fs::read_dir(".")
-                    .unwrap()
-                    .map(|res| res.map(|e| e.path()))
-                    .collect::<Result<Vec<_>, std::io::Error>>()
-                    .unwrap();
+            let me_die = String::from_utf8(data.to_vec())
+                .unwrap()
+                .to_lowercase()
+                .replace('\0', "");
+            let mut timyr = me_die.split(' ');
+            //me_die.chars().for_each(|igor| println!("{igor}"));
 
-                let x = serde_json::to_string(&spisok_failov).unwrap();
+            match (timyr.next().unwrap(), timyr.next()) {
+                ("eee", Some(path)) => {
+                    log::info!("ε=ε=ε=ε=ε=ε=┌(;￣◇￣)┘");
+                    let spisok_failov = std::fs::read_dir(path)
+                        .unwrap()
+                        .map(|res| res.map(|e| e.path()))
+                        .collect::<Result<Vec<_>, std::io::Error>>()
+                        .unwrap();
 
-                stream.write(x.as_bytes()).unwrap();
+                    let x = serde_json::to_string(&spisok_failov).unwrap();
+
+                    stream.write(x.as_bytes()).ok();
+                    true
+                }
+                ("qqw", None) => {
+                    stream.write("bb, lox".as_bytes()).ok();
+                    std::process::exit(100)
+                }
+                _ => true,
             }
-            //println!("ok");
-            true
         }
         Err(_) => {
             println!(
@@ -42,10 +43,13 @@ fn handle_client(mut stream: TcpStream) {
             stream.shutdown(Shutdown::Both).unwrap();
             false
         }
-    } {}
+    } {
+        data.fill(0)
+    }
 }
 
 fn main() {
+    pretty_env_logger::init();
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     // accept connections and process them, spawning a new thread for each one
     println!("Server listening on port 3333");
